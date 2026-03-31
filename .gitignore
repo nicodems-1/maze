@@ -1,5 +1,6 @@
 #specific project files
 output_validator.py
+.venv
 
 # pycache
 **/__pycache__/

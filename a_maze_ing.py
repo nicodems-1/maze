@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from srcs.clean_parsing import Parser
-# from srcs.maze_generation import MazeGenerator
+from srcs.parsing import Parser
+from srcs.maze_generation import MazeGenerator
 import sys
 
 
@@ -12,9 +12,9 @@ def main() -> None:
               file=sys.stderr)
     try:
         config = Parser().config
+        maze = MazeGenerator(config).maze
     except Exception as e:
         print(e, file=sys.stderr)
-    # maze = MazeGenerator(config).maze
 
 if __name__ == '__main__':
     try:
