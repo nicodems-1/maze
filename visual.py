@@ -20,6 +20,7 @@ class Visual:
         self.check = 0
         self.vertical_color = (255, 255, 255)
         self.horizontal_color = (255, 255, 255)
+        self.log_color = (255, 0, 0)
         self.padding = 25
         # key_mapping
         self.key_map = {
@@ -52,6 +53,7 @@ class Visual:
     def change_color(self):
         self.clear_image_buffer()
         self.vertical_color, self.horizontal_color = self.random_colors()
+        _, self.log_color = self.random_colors()
         # self.mlx_instance.mlx_clear_window(self.mlx_ptr, self.win_ptr)
         self.display_maze()
 
@@ -98,7 +100,6 @@ class Visual:
         self.mlx_instance.mlx_put_image_to_window(
             self.mlx_ptr, self.win_ptr, self.img_ptr, 0, 0
         )
-        
 
     def put_pixel(self, x, y, r, g, b):
         index = (y * self.size_line) + (x * (self.bpp // 8))
@@ -113,6 +114,13 @@ class Visual:
         black_pixel = bytes([0, 0, 0, 255])
 
         self.img_data[:] = black_pixel * (self.width * self.height)
+
+    def fill_square(self, offset_x, offset_y):
+        for u in range(self.cell):
+            i = 0
+            for i in range(self.cell):
+                self.put_pixel(self.center_x + offset_x + i, self.center_y + offset_y + u, *self.log_color)
+        u += 1
 
     def create_maze(self, parsed: str):
 
@@ -140,6 +148,8 @@ class Visual:
             for letter in line:
                 nbr = int(letter, 16)
                 self.generate_cells(nbr, x_offset, y_offset)
+                if nbr == 15:
+                    self.fill_square(x_offset, y_offset)
                 x_offset += self.cell
         self.close_maze()
 
@@ -165,11 +175,11 @@ class Visual:
             ((46, 204, 113), (52, 152, 219)),
             ((255, 87, 34), (0, 188, 212)),
             ((245, 245, 220), (205, 127, 50)),
-            ((0, 255, 255), (255, 0, 255)),  # Ton original (Cyan/Magenta)
-            ((138, 43, 226), (255, 165, 0)),  # Outrun
-            ((50, 255, 50), (144, 164, 174)),  # Matrix Tech
-            ((255, 128, 171), (128, 222, 234)),  # Pastel
-            ((255, 0, 0), (255, 255, 150)),  # Volcanique
+            ((0, 255, 255), (255, 0, 255)),
+            ((138, 43, 226), (255, 165, 0)),
+            ((50, 255, 50), (144, 164, 174)),
+            ((255, 128, 171), (128, 222, 234)),
+            ((255, 0, 0), (255, 255, 150)),
             ((0, 102, 255), (127, 255, 212)),
         ]
         return random.choice(list_colors)
