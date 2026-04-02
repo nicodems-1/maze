@@ -11,21 +11,23 @@ class Visual:
         self.mlx_ptr = self.mlx_instance.mlx_init()
 
         self.create_window()
-
         self.img_ptr = self.mlx_instance.mlx_new_image(
             self.mlx_ptr, self.width, self.height
         )
-
         self.img_data, self.bpp, self.size_line, self.endian = (
             self.mlx_instance.mlx_get_data_addr(self.img_ptr)
         )
+        self.check = 0
         self.vertical_color = (255, 255, 255)
         self.horizontal_color = (255, 255, 255)
+        self.padding = 25
         # key_mapping
         self.key_map = {
             99: self.change_color,
             113: self.close_window,
             114: self.regenerate,
+            101: self.dezoom,
+            119: self.zoom,
         }
 
     def handle_input(self, keycode, params):
@@ -33,11 +35,22 @@ class Visual:
         if func:
             func()
 
+    def zoom(self):
+        if self.padding > 20:
+            self.padding -= 2
+        self.display_maze()
+
+    def dezoom(self):
+        if self.padding < 120:
+            self.padding += 2
+        self.display_maze()
+
     def close_window(self):
         self.mlx_instance.mlx_destroy_window(self.mlx_ptr, self.win_ptr)
         self.mlx_instance.mlx_loop_exit(self.mlx_ptr)
 
     def change_color(self):
+        self.clear_image_buffer()
         self.vertical_color, self.horizontal_color = self.random_colors()
         # self.mlx_instance.mlx_clear_window(self.mlx_ptr, self.win_ptr)
         self.display_maze()
@@ -71,13 +84,12 @@ class Visual:
                 )
 
     def display_maze(self):
-        self.mlx_instance.mlx_key_hook(self.win_ptr, self.handle_input, vars)
         self.create_maze(
             "9515391539551795151151153\nEBABAE812853C1412BA812812\n96A8416A84545412AC4282C2A\nC3A83816A9395384453A82D02\n96842A852AC07AAD13A8283C2\nC1296C43AAB83AA92AA8686BA\n92E853968428444682AC12902\nAC3814452FA83FFF82C52C42A\n85684117AFC6857FAC1383D06\nC53AD043AFFFAFFF856AA8143\n91441294297FAFD501142C6BA\nAA912AC3843FAFFF82856D52A\n842A8692A92B8517C4451552A\n816AC384468285293917A9542\nC416928513C443A828456C3BA\n91416AA92C393A82801553AAA\nA81292AA814682C6A8693C6AA\nA8442C6C2C1168552C16A9542\n86956951692C1455416928552\nC545545456C54555545444556"
         )
         self.mlx_instance.mlx_string_put(
             self.mlx_ptr,
-            self.win_ptr,
+            self.img_ptr,
             self.center_x,
             self.height - (self.center_y // 2),
             0xF54927,
@@ -86,7 +98,7 @@ class Visual:
         self.mlx_instance.mlx_put_image_to_window(
             self.mlx_ptr, self.win_ptr, self.img_ptr, 0, 0
         )
-        self.mlx_instance.mlx_loop(self.mlx_ptr)
+        
 
     def put_pixel(self, x, y, r, g, b):
         index = (y * self.size_line) + (x * (self.bpp // 8))
@@ -96,7 +108,15 @@ class Visual:
         self.img_data[index + 2] = r
         self.img_data[index + 3] = 255
 
+    def clear_image_buffer(self):
+
+        black_pixel = bytes([0, 0, 0, 255])
+
+        self.img_data[:] = black_pixel * (self.width * self.height)
+
     def create_maze(self, parsed: str):
+
+        self.clear_image_buffer()
         lines = parsed.split("\n")
 
         # mesuring the size of the maze
@@ -104,7 +124,7 @@ class Visual:
         self.vertical_cells = len(lines)
 
         # centering maze with padding
-        self.cell = self.width // (self.vertical_cells + 25)
+        self.cell = self.width // (self.vertical_cells + self.padding)
         self.center_x = int(
             (self.width - (self.cell * self.horizontal_cells)) / 2
         )
@@ -155,7 +175,9 @@ class Visual:
         return random.choice(list_colors)
 
     def run_win(self):
+        self.mlx_instance.mlx_key_hook(self.win_ptr, self.handle_input, vars)
         self.display_maze()
+        self.mlx_instance.mlx_loop(self.mlx_ptr)
 
 
 if __name__ == "__main__":
