@@ -19,11 +19,30 @@ class Visual:
         self.img_data, self.bpp, self.size_line, self.endian = (
             self.mlx_instance.mlx_get_data_addr(self.img_ptr)
         )
+        self.vertical_color = (255, 255, 255)
+        self.horizontal_color = (255, 255, 255)
+        # key_mapping
+        self.key_map = {
+            99: self.change_color,
+            113: self.close_window,
+            114: self.regenerate,
+        }
 
-    def close_window(self, keycode, params):
-        if keycode == 113:
-            self.mlx_instance.mlx_destroy_window(self.mlx_ptr, self.win_ptr)
-            self.mlx_instance.mlx_loop_exit(self.mlx_ptr)
+    def handle_input(self, keycode, params):
+        func = self.key_map.get(keycode)
+        if func:
+            func()
+
+    def close_window(self):
+        self.mlx_instance.mlx_destroy_window(self.mlx_ptr, self.win_ptr)
+        self.mlx_instance.mlx_loop_exit(self.mlx_ptr)
+
+    def change_color(self):
+        self.vertical_color, self.horizontal_color = self.random_colors()
+        # self.mlx_instance.mlx_clear_window(self.mlx_ptr, self.win_ptr)
+        self.display_maze()
+
+    def regenerate(self): ...
 
     def create_window(self):
         _, self.width, self.height = self.mlx_instance.mlx_get_screen_size(
@@ -40,9 +59,7 @@ class Visual:
                 self.put_pixel(
                     self.center_x + x_offset + i,
                     self.center_y + y_offset,
-                    0,
-                    255,
-                    255,
+                    *self.horizontal_color,
                 )
         # creating column
         if hexa & 8 == 8:
@@ -50,13 +67,11 @@ class Visual:
                 self.put_pixel(
                     self.center_x + x_offset,
                     self.center_y + i + y_offset,
-                    255,
-                    0,
-                    0,
+                    *self.vertical_color,
                 )
 
-    def run_win(self):
-        self.mlx_instance.mlx_key_hook(self.win_ptr, self.close_window, None)
+    def display_maze(self):
+        self.mlx_instance.mlx_key_hook(self.win_ptr, self.handle_input, vars)
         self.create_maze(
             "9515391539551795151151153\nEBABAE812853C1412BA812812\n96A8416A84545412AC4282C2A\nC3A83816A9395384453A82D02\n96842A852AC07AAD13A8283C2\nC1296C43AAB83AA92AA8686BA\n92E853968428444682AC12902\nAC3814452FA83FFF82C52C42A\n85684117AFC6857FAC1383D06\nC53AD043AFFFAFFF856AA8143\n91441294297FAFD501142C6BA\nAA912AC3843FAFFF82856D52A\n842A8692A92B8517C4451552A\n816AC384468285293917A9542\nC416928513C443A828456C3BA\n91416AA92C393A82801553AAA\nA81292AA814682C6A8693C6AA\nA8442C6C2C1168552C16A9542\n86956951692C1455416928552\nC545545456C54555545444556"
         )
@@ -66,7 +81,7 @@ class Visual:
             self.center_x,
             self.height - (self.center_y // 2),
             0xF54927,
-            "Q: quit",
+            "Q: quit   C: change colors    R: regenerate",
         )
         self.mlx_instance.mlx_put_image_to_window(
             self.mlx_ptr, self.win_ptr, self.img_ptr, 0, 0
@@ -83,16 +98,20 @@ class Visual:
 
     def create_maze(self, parsed: str):
         lines = parsed.split("\n")
+
+        # mesuring the size of the maze
         self.horizontal_cells = len(lines[0])
         self.vertical_cells = len(lines)
-        self.cell = self.width // (self.vertical_cells + 22)
+
+        # centering maze with padding
+        self.cell = self.width // (self.vertical_cells + 25)
         self.center_x = int(
             (self.width - (self.cell * self.horizontal_cells)) / 2
         )
         self.center_y = int(
             (self.height - (self.cell * self.vertical_cells)) / 2
         )
-
+        # creating the maze, cell by cell
         y_offset = -self.cell
         x_offset = 0
         for line in lines:
@@ -102,21 +121,20 @@ class Visual:
                 nbr = int(letter, 16)
                 self.generate_cells(nbr, x_offset, y_offset)
                 x_offset += self.cell
-        for i in range(self.cell * len(line)):
+        self.close_maze()
+
+    def close_maze(self):
+        for i in range(self.cell * self.horizontal_cells):
             self.put_pixel(
                 self.center_x + i,
-                self.center_y + len(lines) * self.cell,
-                255,
-                0,
-                0,
+                self.center_y + self.vertical_cells * self.cell,
+                *self.horizontal_color,
             )
-        for i in range(self.cell * len(lines)):
+        for i in range(self.cell * self.vertical_cells):
             self.put_pixel(
-                self.center_x + len(line) * self.cell,
+                self.center_x + self.horizontal_cells * self.cell,
                 self.center_y + i,
-                0,
-                255,
-                0,
+                *self.vertical_color,
             )
 
     @staticmethod
@@ -127,8 +145,17 @@ class Visual:
             ((46, 204, 113), (52, 152, 219)),
             ((255, 87, 34), (0, 188, 212)),
             ((245, 245, 220), (205, 127, 50)),
+            ((0, 255, 255), (255, 0, 255)),  # Ton original (Cyan/Magenta)
+            ((138, 43, 226), (255, 165, 0)),  # Outrun
+            ((50, 255, 50), (144, 164, 174)),  # Matrix Tech
+            ((255, 128, 171), (128, 222, 234)),  # Pastel
+            ((255, 0, 0), (255, 255, 150)),  # Volcanique
+            ((0, 102, 255), (127, 255, 212)),
         ]
         return random.choice(list_colors)
+
+    def run_win(self):
+        self.display_maze()
 
 
 if __name__ == "__main__":
