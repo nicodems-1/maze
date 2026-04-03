@@ -6,7 +6,7 @@ class Cell:
     and if the cell has been visited"""
     def __init__(self, x: int, y: int) -> None:
         self.visited = False
-        self.hex = 0xF
+        self.value = 0b1111
         self.x = x
         self.y = y
 
@@ -28,7 +28,7 @@ class MazeGenerator:
         while self.unvisited_neighbours(current):
             unv = self.unvisited_neighbours(current)
             chosen = unv[randint(0, len(unv))]
-            #TODO: self.break_wall(current, chosen)
+            self.break_wall(current, chosen)
             current = chosen
 
     def unvisited_neighbours(self, current: Cell) -> list[Cell]:
@@ -44,3 +44,18 @@ class MazeGenerator:
         if y < self.config["HEIGHT"] - 1 and not self.maze[x][y + 1].visited:
             unvisited_neighbours.append(self.maze[x][y + 1])
         return unvisited_neighbours
+
+    @staticmethod
+    def break_wall(c1: Cell, c2: Cell) -> None:
+        if c1.y > c2.y:
+            c1.value &= 0b1110
+            c2.value &= 0b1011
+        if c1.x < c2.x:
+            c1.value &= 0b1101
+            c2.value &= 0b0111
+        if c1.y < c2.y:
+            c1.value &= 0b1011
+            c2.value &= 0b1110
+        if c1.x > c2.x:
+            c1.value &= 0b0111
+            c2.value &= 0b1101
