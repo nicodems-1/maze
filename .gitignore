@@ -1,2 +1,12 @@
+#specific project files
 output_validator.py
+.venv
+
+# pycache
+**/__pycache__/
+**/*.pyc
+
+# IDE and specific files
+.vscode/
 .idea/
+.mypy_cache/
