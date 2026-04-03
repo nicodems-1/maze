@@ -12,12 +12,11 @@ def main() -> None:
               file=sys.stderr)
     try:
         config = Parser().config
-        maze = MazeGenerator(config).maze
+        maze = MazeGenerator(config)
+        with open(config["OUTPUT_FILE"], 'w') as output:
+            output.write(str(maze.output))
     except Exception as e:
-        print(e, file=sys.stderr)
+        print(f"{e}", file=sys.stderr)
 
 if __name__ == '__main__':
-    try:
-        main()
-    except Exception as e:
-        print(f"[UNEXPECTED ERROR] {e}", file=sys.stderr)
+    main()
