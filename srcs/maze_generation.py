@@ -18,19 +18,19 @@ class MazeGenerator:
         self.config = config
         self.width = self.config["WIDTH"]
         self.height = self.config["HEIGHT"]
-        self.maze = [[Cell(x, y) for y in range(self.height)]
-                     for x in range(self.width)]
+        self.maze = [[Cell(x, y) for y in range(self.width)]
+                     for x in range(self.height)]
         self.generate_maze()
         self.output = self.format_output()
 
     def generate_maze(self) -> None:
         self.put_42()
-        starting_cell = self.maze[randint(0, self.width)][randint(0, self.height)]
+        starting_cell = self.maze[randint(0, self.height - 1)][randint(0, self.width - 1)]
         self.dfs_algorithm(starting_cell)
 
     def put_42(self) -> None:
-        x = int(self.width / 2) - 3
-        y = int(self.height / 2) - 3
+        x = int(self.height / 2) - 2
+        y = int(self.width / 2) - 3
         for i in range(0, 2):
             self.maze[x][y].visited = True
             x += 1
@@ -74,9 +74,9 @@ class MazeGenerator:
             unvisited_neighbours.append(self.maze[x - 1][y])
         if y > 0 and self.maze[x][y - 1].visited == False:
             unvisited_neighbours.append(self.maze[x][y - 1])
-        if x < self.width - 1 and self.maze[x + 1][y].visited == False:
+        if x < self.height - 1 and self.maze[x + 1][y].visited == False:
             unvisited_neighbours.append(self.maze[x + 1][y])
-        if y < self.height - 1 and self.maze[x][y + 1].visited == False:
+        if y < self.width - 1 and self.maze[x][y + 1].visited == False:
             unvisited_neighbours.append(self.maze[x][y + 1])
         return unvisited_neighbours
 
@@ -99,9 +99,9 @@ class MazeGenerator:
         output = ""
 
         i = 0
-        while i < self.width:
+        while i < self.height:
             j = 0
-            while j < self.height:
+            while j < self.width:
                 output += str(hex(self.maze[i][j].value))[2:]
                 j += 1
             output += "\n"
