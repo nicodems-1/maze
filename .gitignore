@@ -1,6 +1,7 @@
 #specific project files
 output_validator.py
 maze.txt
+test*
 .venv
 
 # pycache

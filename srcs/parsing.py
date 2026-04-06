@@ -12,6 +12,10 @@ def _convert_value(key: str, value: str) -> int | tuple[int, int] | str | bool:
     value = value.strip()
     try:
         if key in ("WIDTH", "HEIGHT"):
+            if key == "WIDTH" and int(value) < 9:
+                raise ParsingError("Width must be greater than 8")
+            if key == "HEIGHT" and int(value) < 7:
+                raise ParsingError("Height must be greater than 6")
             return int(value)
         if key in ("ENTRY", "EXIT"):
             x, y = map(int, value.split(','))
