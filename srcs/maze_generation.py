@@ -1,3 +1,4 @@
+import random
 from random import randint
 
 
@@ -21,6 +22,8 @@ class MazeGenerator:
         self.maze = [[Cell(x, y) for y in range(self.width)]
                      for x in range(self.height)]
         self.generate_maze()
+        if self.config["PERFECT"] == False:
+            self.create_alt_path()
         self.output = self.format_output()
 
     def generate_maze(self) -> None:
@@ -47,6 +50,31 @@ class MazeGenerator:
             output += "\n"
             i +=1
         return output
+
+    def create_alt_path(self):
+        direction = randint(0, 1)
+        x = 0
+        y = 0
+
+        if direction == 0:
+            while (self.maze[x][y].value & 0b0010 == 0 or
+                   self.maze[x][y].value == 0b1111 or
+                   self.maze[x][y + 1].value == 0b1111):
+                y += 1
+                if y == self.width - 1:
+                    x += 1
+                    y = 0
+            self.break_wall(self.maze[x][y], self.maze[x][y + 1])
+
+        if direction == 1:
+            while (self.maze[x][y].value & 0b0100 == 0 or
+                   self.maze[x][y].value == 0b1111 or
+                   self.maze[x + 1][y].value == 0b1111):
+                x += 1
+                if x == self.height - 1:
+                    x = 0
+                    y += 1
+            self.break_wall(self.maze[x][y], self.maze[x + 1][y])
 
     def unvisited_neighbours(self, current: Cell) -> list[Cell]:
         unvisited_neighbours = []

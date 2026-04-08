@@ -7,12 +7,13 @@ import sys
 
 def main() -> None:
     """Main function of the program"""
+    sys.setrecursionlimit(10000)
+
     if len(sys.argv) != 2:
         print("usage: 'python3 a_maze_ing.py <config_file>' or 'make run "
               "<config_file>'\n[ERROR] Missing config file target",
               file=sys.stderr)
-
-    sys.setrecursionlimit(10000)
+        return
 
     # try:
     config = Parser().config
