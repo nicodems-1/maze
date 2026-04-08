@@ -24,7 +24,8 @@ class Visual:
         self.vertical_color = (255, 255, 255)
         self.horizontal_color = (255, 255, 255)
         self.log_color = (255, 0, 0)
-        self.padding = 50
+        self.padding = max(self.config["HEIGHT"],
+                           self.config["WIDTH"])
 
         self.key_map = {
             99: self.change_color,

@@ -2,6 +2,7 @@
 output_validator.py
 maze.txt
 .venv
+*test
 
 # pycache
 **/__pycache__/
