@@ -1,12 +1,15 @@
-from mlx.mlx import Mlx
 from typing import Any
-import sys
-import os
+
+from mlx.mlx import Mlx
+from srcs.maze_generation import generate_maze
 import random
 
 
 class Visual:
-    def __init__(self):
+    def __init__(self, maze_obj, config):
+        self.maze_obj = maze_obj
+        self.config = config
+
         self.mlx_instance = Mlx()
         self.mlx_ptr = self.mlx_instance.mlx_init()
 
@@ -21,8 +24,8 @@ class Visual:
         self.vertical_color = (255, 255, 255)
         self.horizontal_color = (255, 255, 255)
         self.log_color = (255, 0, 0)
-        self.padding = 25
-        # key_mapping
+        self.padding = 50
+
         self.key_map = {
             99: self.change_color,
             113: self.close_window,
@@ -57,7 +60,10 @@ class Visual:
         # self.mlx_instance.mlx_clear_window(self.mlx_ptr, self.win_ptr)
         self.display_maze()
 
-    def regenerate(self): ...
+    def regenerate(self):
+        self.clear_image_buffer()
+        self.maze_obj = generate_maze(self.config)
+        self.display_maze()
 
     def create_window(self):
         _, self.width, self.height = self.mlx_instance.mlx_get_screen_size(
@@ -86,7 +92,7 @@ class Visual:
                 )
 
     def display_maze(self):
-        self.create_maze(sys.argv[1])
+        self.create_maze(str(self.maze_obj.output))
         self.mlx_instance.mlx_string_put(
             self.mlx_ptr,
             self.img_ptr,
@@ -115,15 +121,16 @@ class Visual:
 
     def fill_square(self, offset_x, offset_y):
         for u in range(self.cell):
-            i = 0
             for i in range(self.cell):
-                self.put_pixel(self.center_x + offset_x + i, self.center_y + offset_y + u, *self.log_color)
-        u += 1
+                self.put_pixel(self.center_x + offset_x + i,
+                               self.center_y + offset_y + u,
+                               *self.log_color)
+            u += 1
 
     def create_maze(self, parsed: str):
 
         self.clear_image_buffer()
-        lines = parsed.split("\n")
+        lines = parsed.splitlines()
 
         # mesuring the size of the maze
         self.horizontal_cells = len(lines[0])
@@ -188,6 +195,6 @@ class Visual:
         self.mlx_instance.mlx_loop(self.mlx_ptr)
 
 
-if __name__ == "__main__":
-    obj = Visual()
-    obj.run_win()
+# if __name__ == "__main__":
+#     obj = Visual()
+#     obj.run_win()

@@ -25,8 +25,57 @@ class MazeGenerator:
 
     def generate_maze(self) -> None:
         self.put_42()
-        starting_cell = self.maze[randint(0, self.height - 1)][randint(0, self.width - 1)]
-        self.dfs_algorithm(starting_cell)
+        self.dfs_algorithm(self.maze[0][0])
+
+    def dfs_algorithm(self, current: Cell) -> None:
+        current.visited = True
+        while self.unvisited_neighbours(current):
+            unv = self.unvisited_neighbours(current)
+            chosen = unv[randint(0, len(unv) - 1)]
+            self.break_wall(current, chosen)
+            self.dfs_algorithm(chosen)
+
+    def format_output(self) -> str:
+        output = ""
+
+        i = 0
+        while i < self.height:
+            j = 0
+            while j < self.width:
+                output += str(hex(self.maze[i][j].value))[2:]
+                j += 1
+            output += "\n"
+            i +=1
+        return output
+
+    def unvisited_neighbours(self, current: Cell) -> list[Cell]:
+        unvisited_neighbours = []
+        x = current.x
+        y = current.y
+        if x > 0 and self.maze[x - 1][y].visited == False:
+            unvisited_neighbours.append(self.maze[x - 1][y])
+        if y > 0 and self.maze[x][y - 1].visited == False:
+            unvisited_neighbours.append(self.maze[x][y - 1])
+        if x < self.height - 1 and self.maze[x + 1][y].visited == False:
+            unvisited_neighbours.append(self.maze[x + 1][y])
+        if y < self.width - 1 and self.maze[x][y + 1].visited == False:
+            unvisited_neighbours.append(self.maze[x][y + 1])
+        return unvisited_neighbours
+
+    @staticmethod
+    def break_wall(c1: Cell, c2: Cell) -> None:
+        if c1.x > c2.x:
+            c1.value &= 0b1110
+            c2.value &= 0b1011
+        if c1.y < c2.y:
+            c1.value &= 0b1101
+            c2.value &= 0b0111
+        if c1.x < c2.x:
+            c1.value &= 0b1011
+            c2.value &= 0b1110
+        if c1.y > c2.y:
+            c1.value &= 0b0111
+            c2.value &= 0b1101
 
     def put_42(self) -> None:
         x = int(self.height / 2) - 2
@@ -58,52 +107,9 @@ class MazeGenerator:
             self.maze[x][y].visited = True
             y -= 1
 
-    def dfs_algorithm(self, current: Cell) -> None:
-        current.visited = True
-        while self.unvisited_neighbours(current):
-            unv = self.unvisited_neighbours(current)
-            chosen = unv[randint(0, len(unv) - 1)]
-            self.break_wall(current, chosen)
-            self.dfs_algorithm(chosen)
 
-    def unvisited_neighbours(self, current: Cell) -> list[Cell]:
-        unvisited_neighbours = []
-        x = current.x
-        y = current.y
-        if x > 0 and self.maze[x - 1][y].visited == False:
-            unvisited_neighbours.append(self.maze[x - 1][y])
-        if y > 0 and self.maze[x][y - 1].visited == False:
-            unvisited_neighbours.append(self.maze[x][y - 1])
-        if x < self.height - 1 and self.maze[x + 1][y].visited == False:
-            unvisited_neighbours.append(self.maze[x + 1][y])
-        if y < self.width - 1 and self.maze[x][y + 1].visited == False:
-            unvisited_neighbours.append(self.maze[x][y + 1])
-        return unvisited_neighbours
-
-    @staticmethod
-    def break_wall(c1: Cell, c2: Cell) -> None:
-        if c1.x > c2.x:
-            c1.value &= 0b1110
-            c2.value &= 0b1011
-        if c1.y < c2.y:
-            c1.value &= 0b1101
-            c2.value &= 0b0111
-        if c1.x < c2.x:
-            c1.value &= 0b1011
-            c2.value &= 0b1110
-        if c1.y > c2.y:
-            c1.value &= 0b0111
-            c2.value &= 0b1101
-
-    def format_output(self) -> str:
-        output = ""
-
-        i = 0
-        while i < self.height:
-            j = 0
-            while j < self.width:
-                output += str(hex(self.maze[i][j].value))[2:]
-                j += 1
-            output += "\n"
-            i +=1
-        return output
+def generate_maze(config) -> MazeGenerator:
+    maze_obj = MazeGenerator(config)
+    with open(config["OUTPUT_FILE"], 'w') as output:
+        output.write(str(maze_obj.output))
+    return maze_obj
