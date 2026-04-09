@@ -1,7 +1,6 @@
 from typing import Any
 
 from mlx.mlx import Mlx
-from srcs.maze_generation import generate_maze
 import random
 
 
@@ -62,8 +61,9 @@ class Visual:
         self.display_maze()
 
     def regenerate(self):
+        from a_maze_ing import generate_and_solve_maze
         self.clear_image_buffer()
-        self.maze_obj = generate_maze(self.config)
+        self.maze_obj = generate_and_solve_maze(self.config)
         self.display_maze()
 
     def create_window(self):

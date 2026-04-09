@@ -135,8 +135,3 @@ class MazeGenerator:
             y -= 1
 
 
-def generate_maze(config) -> MazeGenerator:
-    maze_obj = MazeGenerator(config)
-    with open(config["OUTPUT_FILE"], 'w') as output:
-        output.write(str(maze_obj.output))
-    return maze_obj

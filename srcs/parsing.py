@@ -31,6 +31,17 @@ def _convert_value(key: str, value: str) -> int | tuple[int, int] | str | bool:
         raise ParsingError(f"Invalid value for '{key}': '{value}'")
 
 
+def _check_values(config: dict):
+    for x, y in (config["ENTRY"], config["EXIT"]):
+        if x < 0 or x >= config["WIDTH"]:
+            raise ParsingError("Entry and exit must be inside the maze")
+        if y < 0 or y >= config["HEIGHT"]:
+            raise ParsingError("Entry and exit must be inside the maze")
+
+    if config["ENTRY"] == config["EXIT"]:
+        raise ParsingError("Entry and exit must be different cells of the maze")
+
+
 class Parser:
     """Parses maze configuration parameters from
     the file passed as sys.argv[1]."""
@@ -57,11 +68,18 @@ class Parser:
                 for line in f:
                     if line[0] == '#':
                         continue
-                    key, value = line.strip().split('=')
+                    try:
+                        key, value = line.strip().split('=')
+                    except Exception:
+                        raise ParsingError(f"Invalid or empty line: {line}")
                     if key not in self.parameters or not value:
                         raise ParsingError(f"Invalid argument in "
                                            f"'{sys.argv[1]}': '{key}={value}'")
                     self.config[key] = _convert_value(key, value)
+                try:
+                    _check_values(self.config)
+                except ParsingError as e:
+                    raise e
 
         except FileNotFoundError:
             raise Exception(f"[ERROR] File not found: {sys.argv[1]}")
@@ -72,5 +90,8 @@ class Parser:
 
 
 if __name__ == "__main__":
-    parser = Parser()
-    print(parser.config)
+    try:
+        config = Parser().config
+        print(config)
+    except Exception as e:
+        print(e)
