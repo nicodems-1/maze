@@ -8,13 +8,19 @@ import sys
 
 def generate_and_solve_maze(config) -> MazeGenerator:
     maze_obj = MazeGenerator(config)
+    solve_maze(config, maze_obj)
 
-    with open(config["OUTPUT_FILE"], 'w') as output:
-        output.write(str(maze_obj.output))
-        output.write("\n")
-        output.write(str(config["ENTRY"])[1:-1] + "\n")
-        output.write(str(config["EXIT"])[1:-1] + "\n")
-        output.write(solve_maze(config, maze_obj))
+    try:
+        with open(config["OUTPUT_FILE"], 'w') as output:
+            output.write(str(maze_obj.output))
+            output.write("\n")
+            output.write(str(config["ENTRY"])[1:-1] + "\n")
+            output.write(str(config["EXIT"])[1:-1] + "\n")
+            output.write(maze_obj.directions)
+
+    except OSError as e:
+        raise OSError(f"[OSError]: {e}")
+
     return maze_obj
 
 

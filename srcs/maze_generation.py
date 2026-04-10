@@ -16,10 +16,14 @@ class MazeGenerator:
     dict[str, int | tuple[int, int] | str | bool]) -> None:
 
         self.config = config
-        self.width = self.config["WIDTH"]
-        self.height = self.config["HEIGHT"]
+        self.width = config["WIDTH"]
+        self.height = config["HEIGHT"]
+
         self.maze = [[Cell(x, y) for y in range(self.width)]
                      for x in range(self.height)]
+        self.path = []
+        self.directions = str()
+
         self.generate_maze()
         if self.config["PERFECT"] == False:
             self.create_alt_path()
@@ -133,5 +137,3 @@ class MazeGenerator:
         for i in range(0, 3):
             self.maze[x][y].visited = True
             y -= 1
-
-

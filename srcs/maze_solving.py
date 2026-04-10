@@ -1,7 +1,7 @@
 from srcs.maze_generation import MazeGenerator, Cell
 
 
-def solve_maze(config: dict, maze_obj: MazeGenerator) -> str:
+def solve_maze(config: dict, maze_obj: MazeGenerator) -> None:
     maze = maze_obj.maze
     n = maze_obj.height
     m = maze_obj.width
@@ -20,7 +20,8 @@ def solve_maze(config: dict, maze_obj: MazeGenerator) -> str:
     while queue:
         i, j = queue.pop(0)
         if (i, j) == (x_exit, y_exit):
-            return _reconstruct_path(history, i, j, x_entry, y_entry)
+            _reconstruct_path(maze_obj, history, i, j, x_entry, y_entry)
+            return
         for di, dj in directions:
             ni = i + di
             nj = j + dj
@@ -29,17 +30,21 @@ def solve_maze(config: dict, maze_obj: MazeGenerator) -> str:
                     and _is_not_blocked(maze[i][j], maze[ni][nj])):
                 history[(ni, nj)] = ((i, j), directions[(di, dj)])
                 queue.append((ni, nj))
-    return "Did not find exit :/"
 
 
-def _reconstruct_path(history, i, j, x_entry, y_entry) -> str:
+def _reconstruct_path(maze_obj, history, i, j, x_entry, y_entry) -> None:
     path = []
+    directions = []
+
     node = (i, j)
     while node != (x_entry, y_entry):
         parent, direction = history[node]
-        path.append(direction)
+        path.append(parent)
+        directions.append(direction)
         node = parent
-    return "".join(reversed(path))
+
+    maze_obj.directions = "".join(reversed(directions))
+    maze_obj.path = (path[::-1])[1:]
 
 
 def _is_not_blocked(c1: Cell, c2: Cell) -> bool:
