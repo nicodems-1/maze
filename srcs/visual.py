@@ -1,6 +1,4 @@
-from typing import Any
-
-from mlx.mlx import Mlx
+from mlx import Mlx
 import random
 
 
@@ -23,8 +21,7 @@ class Visual:
         self.vertical_color = (255, 255, 255)
         self.horizontal_color = (255, 255, 255)
         self.log_color = (255, 0, 0)
-        self.padding = max(self.config["HEIGHT"],
-                           self.config["WIDTH"])
+        self.padding = max(self.config["HEIGHT"], self.config["WIDTH"])
 
         self.key_map = {
             99: self.change_color,
@@ -62,14 +59,15 @@ class Visual:
 
     def regenerate(self):
         from a_maze_ing import generate_and_solve_maze
+
         self.clear_image_buffer()
         self.maze_obj = generate_and_solve_maze(self.config)
         self.display_maze()
+        print(self.maze_obj.path)
+        print(self.config["ENTRY"])
 
     def create_window(self):
-        _, self.width, self.height = self.mlx_instance.mlx_get_screen_size(
-            self.mlx_ptr
-        )
+        _, self.width, self.height = self.mlx_instance.mlx_get_screen_size(self.mlx_ptr)
         self.win_ptr = self.mlx_instance.mlx_new_window(
             self.mlx_ptr, self.width, self.height, "a-maze-ing"
         )
@@ -102,6 +100,7 @@ class Visual:
             0xF54927,
             "Q: quit   C: change colors    R: regenerate",
         )
+        self.path_draw()
         self.mlx_instance.mlx_put_image_to_window(
             self.mlx_ptr, self.win_ptr, self.img_ptr, 0, 0
         )
@@ -123,9 +122,21 @@ class Visual:
     def fill_square(self, offset_x, offset_y):
         for u in range(self.cell):
             for i in range(self.cell):
-                self.put_pixel(self.center_x + offset_x + i,
-                               self.center_y + offset_y + u,
-                               *self.log_color)
+                self.put_pixel(
+                    self.center_x + offset_x + i,
+                    self.center_y + offset_y + u,
+                    *self.log_color,
+                )
+            u += 1
+
+    def fill_path(self, offset_x, offset_y, color: tuple):
+        for u in range(self.cell - int((self.cell / 2))):
+            for i in range(self.cell - int((self.cell / 2))):
+                self.put_pixel(
+                    self.center_x + offset_x + i + int((self.cell / 2) / 2),
+                    self.center_y + offset_y + u + int((self.cell / 2) / 2),
+                    *color,
+                )
             u += 1
 
     def create_maze(self, parsed: str):
@@ -139,12 +150,8 @@ class Visual:
 
         # centering maze with padding
         self.cell = self.width // (self.vertical_cells + self.padding)
-        self.center_x = int(
-            (self.width - (self.cell * self.horizontal_cells)) / 2
-        )
-        self.center_y = int(
-            (self.height - (self.cell * self.vertical_cells)) / 2
-        )
+        self.center_x = int((self.width - (self.cell * self.horizontal_cells)) / 2)
+        self.center_y = int((self.height - (self.cell * self.vertical_cells)) / 2)
         # creating the maze, cell by cell
         y_offset = -self.cell
         x_offset = 0
@@ -158,6 +165,23 @@ class Visual:
                     self.fill_square(x_offset, y_offset)
                 x_offset += self.cell
         self.close_maze()
+
+    def path_draw(self):
+        x, y = self.real_pos(self.config["ENTRY"])
+        j, q = self.real_pos(self.config["EXIT"])
+        self.fill_path(x, y, (255, 0, 255))
+        self.fill_path(j, q, (0, 255, 0))
+        the_path = self.maze_obj.path
+        for pos in the_path:
+            y, x = self.real_pos(pos)
+            self.fill_path(x, y, (255, 78, 0))
+
+
+    def real_pos(self, pos: tuple) -> tuple:
+        x, y = pos
+        real_x = self.cell * x
+        real_y = self.cell * y
+        return (real_x, real_y)
 
     def close_maze(self):
         for i in range(self.cell * self.horizontal_cells):
@@ -199,3 +223,5 @@ class Visual:
 # if __name__ == "__main__":
 #     obj = Visual()
 #     obj.run_win()
+
+# convert coordinates (0.0)-> (x*self.cell)+x_offset, (y*self.cell)+y_offset

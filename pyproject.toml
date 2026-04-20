@@ -1,12 +1,17 @@
 [project]
-name = "amazing"
+name = "a-maze-ing"
 version = "0.1.0"
-description = "Add your description here"
+description = "generate a maze, solve it and display it"
+authors = [
+    {name = "chafonta, niverdie"}
+]
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = [
-    "mlx",
-]
 
-[tool.uv.sources]
-mlx = { path = "mlx-2.2-py3-none-any.whl" }
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dependencies]
+mlx = {path = "mlx-2.2-py3-ubuntu-any.whl"}

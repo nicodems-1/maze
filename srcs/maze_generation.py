@@ -4,6 +4,7 @@ from random import randint
 class Cell:
     """Cell class, each item contains it's x and y coordinates
     and if the cell has been visited"""
+
     def __init__(self, x: int, y: int) -> None:
         self.visited = False
         self.value = 0b1111
@@ -12,15 +13,15 @@ class Cell:
 
 
 class MazeGenerator:
-    def __init__(self, config:
-    dict[str, int | tuple[int, int] | str | bool]) -> None:
+    def __init__(self, config: dict[str, int | tuple[int, int] | str | bool]) -> None:
 
         self.config = config
         self.width = config["WIDTH"]
         self.height = config["HEIGHT"]
 
-        self.maze = [[Cell(x, y) for y in range(self.width)]
-                     for x in range(self.height)]
+        self.maze = [
+            [Cell(x, y) for y in range(self.width)] for x in range(self.height)
+        ]
         self.path = []
         self.directions = str()
 
@@ -51,7 +52,7 @@ class MazeGenerator:
                 output += str(hex(self.maze[i][j].value))[2:]
                 j += 1
             output += "\n"
-            i +=1
+            i += 1
         return output
 
     def create_alt_path(self):
@@ -60,9 +61,11 @@ class MazeGenerator:
         y = 0
 
         if direction == 0:
-            while (self.maze[x][y].value & 0b0010 == 0 or
-                   self.maze[x][y].value == 0b1111 or
-                   self.maze[x][y + 1].value == 0b1111):
+            while (
+                self.maze[x][y].value & 0b0010 == 0
+                or self.maze[x][y].value == 0b1111
+                or self.maze[x][y + 1].value == 0b1111
+            ):
                 y += 1
                 if y == self.width - 1:
                     x += 1
@@ -70,9 +73,11 @@ class MazeGenerator:
             self.break_wall(self.maze[x][y], self.maze[x][y + 1])
 
         if direction == 1:
-            while (self.maze[x][y].value & 0b0100 == 0 or
-                   self.maze[x][y].value == 0b1111 or
-                   self.maze[x + 1][y].value == 0b1111):
+            while (
+                self.maze[x][y].value & 0b0100 == 0
+                or self.maze[x][y].value == 0b1111
+                or self.maze[x + 1][y].value == 0b1111
+            ):
                 x += 1
                 if x == self.height - 1:
                     x = 0

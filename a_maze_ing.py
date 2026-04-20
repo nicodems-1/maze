@@ -11,7 +11,7 @@ def generate_and_solve_maze(config) -> MazeGenerator:
     solve_maze(config, maze_obj)
 
     try:
-        with open(config["OUTPUT_FILE"], 'w') as output:
+        with open(config["OUTPUT_FILE"], "w") as output:
             output.write(str(maze_obj.output))
             output.write("\n")
             output.write(str(config["ENTRY"])[1:-1] + "\n")
@@ -29,9 +29,11 @@ def main() -> None:
     sys.setrecursionlimit(10000)
 
     if len(sys.argv) != 2:
-        print("usage: 'python3 a_maze_ing.py <config_file>' or 'make run "
-              "<config_file>'\n[ERROR] Missing config file target",
-              file=sys.stderr)
+        print(
+            "usage: 'python3 a_maze_ing.py <config_file>' or 'make run "
+            "<config_file>'\n[ERROR] Missing config file target",
+            file=sys.stderr,
+        )
         return
 
     try:
@@ -44,5 +46,5 @@ def main() -> None:
         print(f"{e}", file=sys.stderr)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -10,10 +10,7 @@ def solve_maze(config: dict, maze_obj: MazeGenerator) -> None:
     x_exit = config["EXIT"][1]
     y_exit = config["EXIT"][0]
     entry = (x_entry, y_entry)
-    directions = {(-1, 0): "N",
-                  (0, 1): "E",
-                  (1, 0): "S",
-                  (0, -1): "W"}
+    directions = {(-1, 0): "N", (0, 1): "E", (1, 0): "S", (0, -1): "W"}
 
     queue = [entry]
     history = {entry: ((x_entry, y_entry), "ENTRY POINT")}
@@ -25,9 +22,12 @@ def solve_maze(config: dict, maze_obj: MazeGenerator) -> None:
         for di, dj in directions:
             ni = i + di
             nj = j + dj
-            if (0 <= ni < n and 0 <= nj < m
-                    and (ni, nj) not in history
-                    and _is_not_blocked(maze[i][j], maze[ni][nj])):
+            if (
+                0 <= ni < n
+                and 0 <= nj < m
+                and (ni, nj) not in history
+                and _is_not_blocked(maze[i][j], maze[ni][nj])
+            ):
                 history[(ni, nj)] = ((i, j), directions[(di, dj)])
                 queue.append((ni, nj))
 
