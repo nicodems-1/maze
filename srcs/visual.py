@@ -6,7 +6,7 @@ class Visual:
     def __init__(self, maze_obj, config):
         self.maze_obj = maze_obj
         self.config = config
-
+        self.draw = False
         self.mlx_instance = Mlx()
         self.mlx_ptr = self.mlx_instance.mlx_init()
 
@@ -27,8 +27,7 @@ class Visual:
             99: self.change_color,
             113: self.close_window,
             114: self.regenerate,
-            101: self.dezoom,
-            119: self.zoom,
+            115: self.path_draw,
         }
 
     def handle_input(self, keycode, params):
@@ -36,38 +35,28 @@ class Visual:
         if func:
             func()
 
-    def zoom(self):
-        if self.padding > 20:
-            self.padding -= 2
-        self.display_maze()
-
-    def dezoom(self):
-        if self.padding < 120:
-            self.padding += 2
-        self.display_maze()
-
     def close_window(self):
         self.mlx_instance.mlx_destroy_window(self.mlx_ptr, self.win_ptr)
         self.mlx_instance.mlx_loop_exit(self.mlx_ptr)
 
     def change_color(self):
-        self.clear_image_buffer()
         self.vertical_color, self.horizontal_color = self.random_colors()
         _, self.log_color = self.random_colors()
-        # self.mlx_instance.mlx_clear_window(self.mlx_ptr, self.win_ptr)
         self.display_maze()
+        if self.draw is True:
+            self.draw = False
+            self.path_draw()
 
     def regenerate(self):
         from a_maze_ing import generate_and_solve_maze
-
-        self.clear_image_buffer()
+        self.draw = False
         self.maze_obj = generate_and_solve_maze(self.config)
         self.display_maze()
-        print(self.maze_obj.path)
-        print(self.config["ENTRY"])
 
     def create_window(self):
-        _, self.width, self.height = self.mlx_instance.mlx_get_screen_size(self.mlx_ptr)
+        _, self.width, self.height = self.mlx_instance.mlx_get_screen_size(
+            self.mlx_ptr
+        )
         self.win_ptr = self.mlx_instance.mlx_new_window(
             self.mlx_ptr, self.width, self.height, "a-maze-ing"
         )
@@ -92,15 +81,49 @@ class Visual:
 
     def display_maze(self):
         self.create_maze(str(self.maze_obj.output))
+        x, y = self.real_pos(self.config["ENTRY"])
+        j, q = self.real_pos(self.config["EXIT"])
+        self.fill_path(x, y, (255, 0, 0))
+        self.fill_path(j, q, (0, 255, 0))
+        self.mlx_instance.mlx_clear_window(self.mlx_ptr, self.win_ptr)
+        self.mlx_instance.mlx_string_put(
+            self.mlx_ptr, self.win_ptr, 3000, 250, int("0000FF", 16), "ENTRY"
+        )
+        self.mlx_instance.mlx_string_put(
+            self.mlx_ptr, self.win_ptr, 3000, 270, int("00FF00", 16), "EXIT"
+        )
         self.mlx_instance.mlx_string_put(
             self.mlx_ptr,
-            self.img_ptr,
-            self.center_x,
-            self.height - (self.center_y // 2),
-            0xF54927,
-            "Q: quit   C: change colors    R: regenerate",
+            self.win_ptr,
+            3000,
+            290,
+            int("FFE100", 16),
+            "C : Change color",
         )
-        self.path_draw()
+        self.mlx_instance.mlx_string_put(
+            self.mlx_ptr,
+            self.win_ptr,
+            3000,
+            310,
+            int("FFE100", 16),
+            "Q : Close window",
+        )
+        self.mlx_instance.mlx_string_put(
+            self.mlx_ptr,
+            self.win_ptr,
+            3000,
+            330,
+            int("FFE100", 16),
+            "S : Show/hide path",
+        )
+        self.mlx_instance.mlx_string_put(
+            self.mlx_ptr,
+            self.win_ptr,
+            3000,
+            350,
+            int("FFE100", 16),
+            "R : Regenerate Maze",
+        )
         self.mlx_instance.mlx_put_image_to_window(
             self.mlx_ptr, self.win_ptr, self.img_ptr, 0, 0
         )
@@ -112,12 +135,6 @@ class Visual:
         self.img_data[index + 1] = g
         self.img_data[index + 2] = r
         self.img_data[index + 3] = 255
-
-    def clear_image_buffer(self):
-
-        black_pixel = bytes([0, 0, 0, 255])
-
-        self.img_data[:] = black_pixel * (self.width * self.height)
 
     def fill_square(self, offset_x, offset_y):
         for u in range(self.cell):
@@ -140,8 +157,7 @@ class Visual:
             u += 1
 
     def create_maze(self, parsed: str):
-
-        self.clear_image_buffer()
+        self.img_data[:] = b"\x00" * len(self.img_data)
         lines = parsed.splitlines()
 
         # mesuring the size of the maze
@@ -150,8 +166,12 @@ class Visual:
 
         # centering maze with padding
         self.cell = self.width // (self.vertical_cells + self.padding)
-        self.center_x = int((self.width - (self.cell * self.horizontal_cells)) / 2)
-        self.center_y = int((self.height - (self.cell * self.vertical_cells)) / 2)
+        self.center_x = int(
+            (self.width - (self.cell * self.horizontal_cells)) / 2
+        )
+        self.center_y = int(
+            (self.height - (self.cell * self.vertical_cells)) / 2
+        )
         # creating the maze, cell by cell
         y_offset = -self.cell
         x_offset = 0
@@ -167,15 +187,24 @@ class Visual:
         self.close_maze()
 
     def path_draw(self):
-        x, y = self.real_pos(self.config["ENTRY"])
-        j, q = self.real_pos(self.config["EXIT"])
-        self.fill_path(x, y, (255, 0, 255))
-        self.fill_path(j, q, (0, 255, 0))
-        the_path = self.maze_obj.path
-        for pos in the_path:
-            y, x = self.real_pos(pos)
-            self.fill_path(x, y, (255, 78, 0))
-
+        if self.draw is False:
+            the_path = self.maze_obj.path
+            for pos in the_path:
+                y, x = self.real_pos(pos)
+                self.fill_path(x, y, (255, 78, 0))
+            self.mlx_instance.mlx_put_image_to_window(
+                self.mlx_ptr, self.win_ptr, self.img_ptr, 0, 0
+            )
+            self.draw = True
+        elif self.draw is True:
+            the_path = self.maze_obj.path
+            for pos in the_path:
+                y, x = self.real_pos(pos)
+                self.fill_path(x, y, (0, 0, 0))
+            self.mlx_instance.mlx_put_image_to_window(
+                self.mlx_ptr, self.win_ptr, self.img_ptr, 0, 0
+            )
+            self.draw = False
 
     def real_pos(self, pos: tuple) -> tuple:
         x, y = pos
@@ -218,10 +247,3 @@ class Visual:
         self.mlx_instance.mlx_key_hook(self.win_ptr, self.handle_input, vars)
         self.display_maze()
         self.mlx_instance.mlx_loop(self.mlx_ptr)
-
-
-# if __name__ == "__main__":
-#     obj = Visual()
-#     obj.run_win()
-
-# convert coordinates (0.0)-> (x*self.cell)+x_offset, (y*self.cell)+y_offset

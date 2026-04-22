@@ -17,6 +17,10 @@ def _convert_value(key: str, value: str) -> int | tuple[int, int] | str | bool:
                 raise ParsingError("Width must be greater than 8")
             if key == "HEIGHT" and int(value) < 7:
                 raise ParsingError("Height must be greater than 6")
+            if key == "WIDTH" and int(value) > 150:
+                raise ParsingError("Width cannot be greater than 150")
+            if key == "HEIGHT" and int(value) > 150:
+                raise ParsingError("Height cannot be greater than 150")
             return int(value)
         if key in ("ENTRY", "EXIT"):
             x, y = map(int, value.split(","))

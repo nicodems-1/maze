@@ -13,7 +13,9 @@ class Cell:
 
 
 class MazeGenerator:
-    def __init__(self, config: dict[str, int | tuple[int, int] | str | bool]) -> None:
+    def __init__(
+        self, config: dict[str, int | tuple[int, int] | str | bool]
+    ) -> None:
 
         self.config = config
         self.width = config["WIDTH"]
@@ -26,7 +28,7 @@ class MazeGenerator:
         self.directions = str()
 
         self.generate_maze()
-        if self.config["PERFECT"] == False:
+        if self.config["PERFECT"] is False:
             self.create_alt_path()
         self.output = self.format_output()
 
@@ -114,6 +116,7 @@ class MazeGenerator:
             c2.value &= 0b1101
 
     def put_42(self) -> None:
+        logo = []
         x = int(self.height / 2) - 2
         y = int(self.width / 2) - 3
         for i in range(0, 2):
@@ -129,16 +132,25 @@ class MazeGenerator:
         y += 4
         for i in range(0, 2):
             self.maze[x][y].visited = True
+            logo.append((x, y))
             y -= 1
         for i in range(0, 2):
             self.maze[x][y].visited = True
+            logo.append((x, y))
             x -= 1
         for i in range(0, 2):
             self.maze[x][y].visited = True
+            logo.append((x, y))
             y += 1
         for i in range(0, 2):
             self.maze[x][y].visited = True
+            logo.append((x, y))
             x -= 1
         for i in range(0, 3):
             self.maze[x][y].visited = True
+            logo.append((x, y))
             y -= 1
+        if self.config["EXIT"] in logo:
+            raise ValueError("[PARSING ERROR] Exit cannot be in the 42 logo")
+        if self.config["ENTRY"] in logo:
+            raise ValueError("[PARSING ERROR] Entry cannot be in the 42 logo")
