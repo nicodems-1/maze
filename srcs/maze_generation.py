@@ -1,5 +1,4 @@
 from random import randint
-import random
 
 
 class Cell:
@@ -90,13 +89,13 @@ class MazeGenerator:
         unvisited_neighbours = []
         x = current.x
         y = current.y
-        if x > 0 and self.maze[x - 1][y].visited == False:
+        if x > 0 and self.maze[x - 1][y].visited is False:
             unvisited_neighbours.append(self.maze[x - 1][y])
-        if y > 0 and self.maze[x][y - 1].visited == False:
+        if y > 0 and self.maze[x][y - 1].visited is False:
             unvisited_neighbours.append(self.maze[x][y - 1])
-        if x < self.height - 1 and self.maze[x + 1][y].visited == False:
+        if x < self.height - 1 and self.maze[x + 1][y].visited is False:
             unvisited_neighbours.append(self.maze[x + 1][y])
-        if y < self.width - 1 and self.maze[x][y + 1].visited == False:
+        if y < self.width - 1 and self.maze[x][y + 1].visited is False:
             unvisited_neighbours.append(self.maze[x][y + 1])
         return unvisited_neighbours
 

@@ -4,4 +4,4 @@ ENTRY=0, 0
 EXIT=11, 13
 OUTPUT_FILE=maze.txt
 PERFECT=False
-SEED=oaibf
+SEED=42
