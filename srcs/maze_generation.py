@@ -1,4 +1,5 @@
 from random import randint
+import random
 
 
 class Cell:
@@ -24,7 +25,6 @@ class MazeGenerator:
         self.maze = [
             [Cell(x, y) for y in range(self.width)] for x in range(self.height)
         ]
-        self.path = []
         self.directions = str()
 
         self.generate_maze()

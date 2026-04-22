@@ -44,14 +44,24 @@ def _check_values(config: dict):
             raise ParsingError("Entry and exit must be inside the maze")
 
     if config["ENTRY"] == config["EXIT"]:
-        raise ParsingError("Entry and exit must be different cells of the maze")
+        raise ParsingError(
+            "Entry and exit must be different cells of the maze"
+        )
 
 
 class Parser:
     """Parses maze configuration parameters from
     the file passed as sys.argv[1]."""
 
-    parameters = {"WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT"}
+    parameters = {
+        "WIDTH",
+        "HEIGHT",
+        "ENTRY",
+        "EXIT",
+        "OUTPUT_FILE",
+        "PERFECT",
+        "SEED",
+    }
 
     def __init__(self) -> None:
         self.config: dict[str, int | tuple[int, int] | str | bool] = {}

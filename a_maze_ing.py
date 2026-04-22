@@ -4,9 +4,12 @@ from srcs.maze_generation import MazeGenerator
 from srcs.visual import Visual
 from srcs.maze_solving import solve_maze
 import sys
+import random
 
 
 def generate_and_solve_maze(config) -> MazeGenerator:
+    if config.get("SEED") is not None:
+        random.seed(config.get("SEED"))
     maze_obj = MazeGenerator(config)
     solve_maze(config, maze_obj)
 
