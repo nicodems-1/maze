@@ -1,14 +1,41 @@
-from mlx import Mlx
+from mlx import Mlx # type: ignore
 import random
+from srcs.maze_generation import MazeGenerator # type: ignore
+from typing import Callable, Dict, Tuple, Union, cast
+
+ConfigDict = Dict[str, Union[int, Tuple[int, int], str, bool]]
 
 
 class Visual:
-    def __init__(self, maze_obj, config):
+    mlx_instance: Mlx
+    mlx_ptr: int
+    win_ptr: int
+    img_ptr: int
+    img_data: bytearray
+    bpp: int
+    size_line: int
+    endian: int
+    cell: int
+    center_x: int
+    center_y: int
+    horizontal_cells: int
+    vertical_cells: int
+
+    def __init__(self, maze_obj: MazeGenerator, config: ConfigDict) -> None:
         self.maze_obj = maze_obj
         self.config = config
-        self.draw = False
+        self.draw: bool = False
         self.mlx_instance = Mlx()
-        self.mlx_ptr = self.mlx_instance.mlx_init()
+        self.mlx_ptr: int = self.mlx_instance.mlx_init()
+
+        self.width = 0
+        self.height = 0
+        self.win_ptr = 0
+        self.cell = 0
+        self.center_x = 0
+        self.center_y = 0
+        self.horizontal_cells = 0
+        self.vertical_cells = 0
 
         self.create_window()
         self.img_ptr = self.mlx_instance.mlx_new_image(
@@ -21,7 +48,9 @@ class Visual:
         self.vertical_color = (255, 255, 255)
         self.horizontal_color = (255, 255, 255)
         self.log_color = (255, 0, 0)
-        self.padding = max(self.config["HEIGHT"], self.config["WIDTH"])
+        height_val = cast(int, self.config["HEIGHT"])
+        width_val = cast(int, self.config["WIDTH"])
+        self.padding = max(height_val, width_val)
 
         self.key_map = {
             99: self.change_color,
@@ -30,7 +59,7 @@ class Visual:
             115: self.path_draw,
         }
 
-    def handle_input(self, keycode, params):
+    def handle_input(self, keycode: int, params: Callable):
         func = self.key_map.get(keycode)
         if func:
             func()
@@ -49,6 +78,7 @@ class Visual:
 
     def regenerate(self):
         from a_maze_ing import generate_and_solve_maze
+
         self.draw = False
         self.maze_obj = generate_and_solve_maze(self.config)
         self.display_maze()
@@ -61,7 +91,7 @@ class Visual:
             self.mlx_ptr, self.width, self.height, "a-maze-ing"
         )
 
-    def generate_cells(self, hexa, x_offset, y_offset):
+    def generate_cells(self, hexa: int, x_offset: int, y_offset: int):
         # creating line
         if hexa & 1 == 1:
             for i in range(self.cell):
@@ -128,7 +158,7 @@ class Visual:
             self.mlx_ptr, self.win_ptr, self.img_ptr, 0, 0
         )
 
-    def put_pixel(self, x, y, r, g, b):
+    def put_pixel(self, x: int, y: int, r: int, g: int, b: int):
         index = (y * self.size_line) + (x * (self.bpp // 8))
 
         self.img_data[index] = b
@@ -136,7 +166,7 @@ class Visual:
         self.img_data[index + 2] = r
         self.img_data[index + 3] = 255
 
-    def fill_square(self, offset_x, offset_y):
+    def fill_square(self, offset_x: int, offset_y: int):
         for u in range(self.cell):
             for i in range(self.cell):
                 self.put_pixel(
@@ -146,7 +176,7 @@ class Visual:
                 )
             u += 1
 
-    def fill_path(self, offset_x, offset_y, color: tuple):
+    def fill_path(self, offset_x: int, offset_y: int, color: tuple):
         for u in range(self.cell - int((self.cell / 2))):
             for i in range(self.cell - int((self.cell / 2))):
                 self.put_pixel(
