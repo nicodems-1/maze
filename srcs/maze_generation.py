@@ -1,4 +1,5 @@
 from random import randint
+from .parsing import MazeConfig
 
 
 class Cell:
@@ -13,21 +14,20 @@ class Cell:
 
 
 class MazeGenerator:
-    def __init__(
-        self, config: dict[str, int | tuple[int, int] | str | bool]
-    ) -> None:
-
+    def __init__(self, config: MazeConfig) -> None:
         self.config = config
-        self.width = config["WIDTH"]
-        self.height = config["HEIGHT"]
+        self.width: int = config["WIDTH"]
+        self.height: int = config["HEIGHT"]
 
         self.maze = [
             [Cell(x, y) for y in range(self.width)] for x in range(self.height)
         ]
-        self.directions = str()
+
+        self.directions: str
+        self.path: list[tuple[int, int]]
 
         self.generate_maze()
-        if self.config["PERFECT"] is False:
+        if not self.config["PERFECT"]:
             self.create_alt_path()
         self.output = self.format_output()
 
@@ -56,7 +56,7 @@ class MazeGenerator:
             i += 1
         return output
 
-    def create_alt_path(self):
+    def create_alt_path(self) -> None:
         direction = randint(0, 1)
         x = 0
         y = 0

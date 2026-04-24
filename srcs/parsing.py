@@ -1,4 +1,5 @@
 import sys
+from typing import TypedDict, cast
 
 
 class ParsingError(Exception):
@@ -6,6 +7,16 @@ class ParsingError(Exception):
 
     def __init__(self, message: str):
         super().__init__(message)
+
+
+class MazeConfig(TypedDict):
+    WIDTH: int
+    HEIGHT: int
+    ENTRY: tuple[int, int]
+    EXIT: tuple[int, int]
+    OUTPUT_FILE: str
+    PERFECT: bool
+    SEED: int
 
 
 def _convert_value(key: str, value: str) -> int | tuple[int, int] | str | bool:
@@ -36,14 +47,17 @@ def _convert_value(key: str, value: str) -> int | tuple[int, int] | str | bool:
         raise ParsingError(f"Invalid value for '{key}': '{value}'")
 
 
-def _check_values(config: dict):
-    for x, y in (config["ENTRY"], config["EXIT"]):
-        if x < 0 or x >= config["WIDTH"]:
+def _check_values(_config: MazeConfig) -> None:
+    _entry: tuple[int, int] = _config["ENTRY"]
+    _exit: tuple[int, int] = _config["EXIT"]
+
+    for x, y in [_entry, _exit]:
+        if x < 0 or x >= _config["WIDTH"]:
             raise ParsingError("Entry and exit must be inside the maze")
-        if y < 0 or y >= config["HEIGHT"]:
+        if y < 0 or y >= _config["HEIGHT"]:
             raise ParsingError("Entry and exit must be inside the maze")
 
-    if config["ENTRY"] == config["EXIT"]:
+    if _entry == _exit:
         raise ParsingError(
             "Entry and exit must be different cells of the maze"
         )
@@ -64,14 +78,12 @@ class Parser:
     }
 
     def __init__(self) -> None:
-        self.config: dict[str, int | tuple[int, int] | str | bool] = {}
-        try:
-            self.parse_txt()
-        except Exception as e:
-            raise Exception(e)
+        self.config: MazeConfig = self._parse_txt()
 
-    def parse_txt(self) -> None:
+    def _parse_txt(self) -> MazeConfig:
         """Reads the file and populates the config dictionary."""
+        raw: dict[str, int | tuple[int, int] | str | bool] = {}
+
         try:
             with open(sys.argv[1], "r") as f:
                 for line in f:
@@ -83,20 +95,26 @@ class Parser:
                         raise ParsingError(f"Invalid or empty line: {line}")
                     if key not in self.parameters or not value:
                         raise ParsingError(
-                            f"Invalid argument in '{sys.argv[1]}': '{key}={value}'"
+                            f"Invalid argument in '{sys.argv[1]}': "
+                            f"'{key}={value}'"
                         )
-                    self.config[key] = _convert_value(key, value)
-                try:
-                    _check_values(self.config)
-                except ParsingError as e:
-                    raise e
+                    raw[key] = _convert_value(key, value)
+
+            missing = self.parameters - raw.keys()
+            if missing:
+                raise ParsingError(f"Missing required parameters: "
+                                   f"{str(missing).strip('{}')}")
+
+            _config = cast(MazeConfig, cast(object, raw))
+            _check_values(_config)
+            return _config
 
         except FileNotFoundError:
             raise Exception(f"[ERROR] File not found: {sys.argv[1]}")
-        except ParsingError as e:
-            raise Exception(f"[PARSING ERROR] {e}")
-        except Exception as e:
-            raise Exception(f"[ERROR] Unexpected error: {e}")
+        except ParsingError as _e:
+            raise Exception(f"[PARSING ERROR] {_e}")
+        except Exception as _e:
+            raise Exception(f"[ERROR] Unexpected error: {_e}")
 
 
 if __name__ == "__main__":

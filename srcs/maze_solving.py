@@ -1,7 +1,8 @@
-from srcs.maze_generation import MazeGenerator, Cell
+from .maze_generation import MazeGenerator, Cell
+from .parsing import MazeConfig
 
 
-def solve_maze(config: dict, maze_obj: MazeGenerator) -> None:
+def solve_maze(config: MazeConfig, maze_obj: MazeGenerator) -> None:
     maze = maze_obj.maze
     n = maze_obj.height
     m = maze_obj.width
@@ -32,7 +33,16 @@ def solve_maze(config: dict, maze_obj: MazeGenerator) -> None:
                 queue.append((ni, nj))
 
 
-def _reconstruct_path(maze_obj, history, i, j, x_entry, y_entry) -> None:
+def _reconstruct_path(maze_obj: MazeGenerator,
+                      history: dict[
+                          tuple[int, int],
+                          tuple[tuple[int, int],
+                                str]
+                      ],
+                      i: int,
+                      j: int,
+                      x_entry: int,
+                      y_entry: int) -> None:
     path = []
     directions = []
 
