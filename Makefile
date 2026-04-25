@@ -5,7 +5,11 @@ CONFIG = config.txt
 MLX_WHL = mlx-2.2-py3-ubuntu-any.whl
 WHL_COMPAT = mlx-2.2-py3-none-any.whl
 VENV_DONE = .venv/.install_done
-SRCS = srcs/visual.py srcs/parsing.py srcs/maze_solving.py srcs/maze_generation.py a-maze-ing.py
+SRCS = srcs/visual.py \
+       srcs/parsing.py \
+       srcs/maze_solving.py \
+       srcs/maze_generation.py \
+       ./a_maze_ing.py
 .PHONY: install run debug clean lint lint-strict 
 
 install: $(VENV_DONE)
@@ -39,3 +43,7 @@ lint-strict:
 	$(UV_RUN) flake8  $(SRCS)
 	$(UV_RUN) mypy  $(SRCS) --strict
 
+test_path:
+	@pwd
+	@ls -l a-maze-ing.py
+	@echo "Variables SRCS: $(SRCS)"
