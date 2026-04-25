@@ -4,23 +4,25 @@ MAIN = a_maze_ing.py
 CONFIG = config.txt
 MLX_WHL = mlx-2.2-py3-ubuntu-any.whl
 WHL_COMPAT = mlx-2.2-py3-none-any.whl
+VENV_DONE = .venv/.install_done
 
-.PHONY: all install run debug clean lint lint-strict 
+.PHONY: install run debug clean lint lint-strict 
 
-all: install
+install: $(VENV_DONE)
 
-install: $(WHL_COMPAT)
+$(WHL_COMPAT): $(MLX_WHL)
+	@cp $(MLX_WHL) $(WHL_COMPAT)
+
+$(VENV_DONE): pyproject.toml $(WHL_COMPAT)
 	uv python install $(PYTHON_VERSION)
 	uv sync
 	uv pip install ./$(WHL_COMPAT)
+	@touch $(VENV_DONE)
 
-$(WHL_COMPAT):
-	@cp $(MLX_WHL) $(WHL_COMPAT)
-
-run: install 
+run: $(VENV_DONE) 
 	$(UV_RUN) python $(MAIN) $(CONFIG)
 
-debug:.venv
+debug:
 	$(UV_RUN) python -m pdb $(MAIN) $(CONFIG)
 
 clean:
