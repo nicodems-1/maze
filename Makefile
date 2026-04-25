@@ -5,7 +5,7 @@ CONFIG = config.txt
 MLX_WHL = mlx-2.2-py3-ubuntu-any.whl
 WHL_COMPAT = mlx-2.2-py3-none-any.whl
 VENV_DONE = .venv/.install_done
-
+SRCS = srcs/visual.py srcs/maze.py srcs/solver.py srcs/utils.py a-maze-ing.py
 .PHONY: install run debug clean lint lint-strict 
 
 install: $(VENV_DONE)
@@ -32,10 +32,10 @@ clean:
 	rm -rf .venv .mypy_cache __pycache__ $(WHL_COMPAT)
 
 lint:
-	$(UV_RUN) flake8 srcs a-maze-ing.py
-	$(UV_RUN) mypy srcs --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+	$(UV_RUN) flake8 $(SRCS)
+	$(UV_RUN) mypy $(SRCS) --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 lint-strict:
-	$(UV_RUN) flake8  srcs a-maze-ing.py
-	$(UV_RUN) mypy  srcs a-maze-ing.py --strict
+	$(UV_RUN) flake8  $(SRCS)
+	$(UV_RUN) mypy  $(SRCS) --strict
 
