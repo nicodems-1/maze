@@ -7,11 +7,7 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.13"
-
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.dependencies]
-mlx = {path = "mlx-2.2-py3-ubuntu-any.whl"}
+dependencies = [
+    "flake8>=7.3.0",
+    "mypy>=1.20.2",
+]
