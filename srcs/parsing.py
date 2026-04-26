@@ -13,14 +13,20 @@ def _convert_value(key: str, value: str) -> int | tuple[int, int] | str | bool:
     value = value.strip()
     try:
         if key in ("WIDTH", "HEIGHT"):
-            if key == "WIDTH" and int(value) < 9:
-                raise ParsingError("Width must be greater than 8")
-            if key == "HEIGHT" and int(value) < 7:
-                raise ParsingError("Height must be greater than 6")
-            if key == "WIDTH" and int(value) > 150:
-                raise ParsingError("Width cannot be greater than 150")
-            if key == "HEIGHT" and int(value) > 150:
-                raise ParsingError("Height cannot be greater than 150")
+            if key == "WIDTH":
+                if int(value) < 3:
+                    raise ParsingError("Width cannot be smaller than 3")
+                if int(value) < 9:
+                    print("Width should be greater than 8 to display '42'", file=sys.stderr)
+            if key == "HEIGHT":
+                if int(value) < 3:
+                    raise ParsingError("Height cannot be smaller than 3")
+                if int(value) < 7:
+                    print("Height should be greater than 6 to display '42'", file=sys.stderr)
+            if key == "WIDTH" and int(value) > 420:
+                raise ParsingError("Width cannot be greater than 420")
+            if key == "HEIGHT" and int(value) > 420:
+                raise ParsingError("Height cannot be greater than 420")
             return int(value)
         if key in ("ENTRY", "EXIT"):
             x, y = map(int, value.split(","))

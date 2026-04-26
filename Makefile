@@ -1,5 +1,5 @@
 UV_RUN = uv run
-PYTHON_VERSION = 3.12
+PYTHON_VERSION = 3.13
 MAIN = a_maze_ing.py
 CONFIG = config.txt
 MLX_WHL = mlx-2.2-py3-ubuntu-any.whl
@@ -10,7 +10,6 @@ SRCS = srcs/visual.py \
        srcs/maze_solving.py \
        srcs/maze_generation.py \
        ./a_maze_ing.py
-.PHONY: install run debug clean lint lint-strict 
 
 install: $(VENV_DONE)
 
@@ -47,3 +46,6 @@ test_path:
 	@pwd
 	@ls -l a-maze-ing.py
 	@echo "Variables SRCS: $(SRCS)"
+
+
+.PHONY: install run debug clean lint lint-strict
