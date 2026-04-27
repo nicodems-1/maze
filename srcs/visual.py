@@ -1,9 +1,16 @@
+<<<<<<< Updated upstream
 from mlx import Mlx # type: ignore
 import random
 from srcs.maze_generation import MazeGenerator # type: ignore
 from typing import Callable, Dict, Tuple, Union, cast
 
 ConfigDict = Dict[str, Union[int, Tuple[int, int], str, bool]]
+=======
+import random
+from mlx import Mlx  # type: ignore
+from .maze_generation import MazeGenerator
+from .parsing import MazeConfig
+>>>>>>> Stashed changes
 
 
 class Visual:
