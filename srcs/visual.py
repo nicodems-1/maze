@@ -1,8 +1,8 @@
 import random
 from mlx import Mlx  # type: ignore
-from srcs.maze_generation import MazeGenerator
-from srcs.parsing import MazeConfig
 from typing import Any
+from srcs.mazegen import MazeGenerator
+from srcs.mazegen import MazeConfig
 
 
 class Visual:
@@ -71,7 +71,7 @@ class Visual:
         self.vertical_color, self.horizontal_color = self.random_colors()
         _, self.log_color = self.random_colors()
         self.display_maze()
-        if self.draw is True:
+        if self.draw:
             self.draw = False
             self.path_draw()
 
@@ -225,7 +225,7 @@ class Visual:
         self.close_maze()
 
     def path_draw(self) -> None:
-        if self.draw is False:
+        if not self.draw:
             the_path = self.maze_obj.path
             for pos in the_path:
                 y, x = self.real_pos(pos)
@@ -234,7 +234,7 @@ class Visual:
                 self.mlx_ptr, self.win_ptr, self.img_ptr, 0, 0
             )
             self.draw = True
-        elif self.draw is True:
+        elif self.draw:
             the_path = self.maze_obj.path
             for pos in the_path:
                 y, x = self.real_pos(pos)
@@ -248,7 +248,7 @@ class Visual:
         x, y = pos
         real_x = self.cell * x
         real_y = self.cell * y
-        return (real_x, real_y)
+        return real_x, real_y
 
     def close_maze(self) -> None:
         for i in range(self.cell * self.horizontal_cells):

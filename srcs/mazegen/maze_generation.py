@@ -1,5 +1,15 @@
 from random import randint
-from .parsing import MazeConfig
+from typing import TypedDict
+
+
+class MazeConfig(TypedDict):
+    WIDTH: int
+    HEIGHT: int
+    ENTRY: tuple[int, int]
+    EXIT: tuple[int, int]
+    OUTPUT_FILE: str
+    PERFECT: bool
+    SEED: int
 
 
 class Cell:
@@ -23,18 +33,26 @@ class MazeGenerator:
             [Cell(x, y) for y in range(self.width)] for x in range(self.height)
         ]
 
-        self.directions: str
-        self.path: list[tuple[int, int]]
+        self.directions: str = ""
+        self.path: list[tuple[int, int]] = []
+        self.output: str = ""
 
         self.generate_maze()
         if not self.config["PERFECT"]:
             self.create_alt_path()
-        self.output = self.format_output()
+        self.solve_maze()
+        self.format_output()
+        self.write_output()
 
     def generate_maze(self) -> None:
         if self.width > 8 and self.height > 6:
             self.put_42()
         self.dfs_algorithm(self.maze[0][0])
+
+    def solve_maze(self) -> None:
+        from .maze_solving import maze_solver
+        maze_solver(self)
+
 
     def dfs_algorithm(self, current: Cell) -> None:
         current.visited = True
@@ -44,18 +62,27 @@ class MazeGenerator:
             self.break_wall(current, chosen)
             self.dfs_algorithm(chosen)
 
-    def format_output(self) -> str:
-        output = ""
-
+    def format_output(self) -> None:
         i = 0
         while i < self.height:
             j = 0
             while j < self.width:
-                output += str(hex(self.maze[i][j].value))[2:]
+                self.output += str(hex(self.maze[i][j].value))[2:]
                 j += 1
-            output += "\n"
+            self.output += "\n"
             i += 1
-        return output
+
+    def write_output(self) -> None:
+        try:
+            with open(self.config["OUTPUT_FILE"], "w") as output:
+                output.write(str(self.output))
+                output.write("\n")
+                output.write(str(self.config["ENTRY"])[1:-1] + "\n")
+                output.write(str(self.config["EXIT"])[1:-1] + "\n")
+                output.write(self.directions)
+
+        except OSError as e:
+            raise OSError(f"[OSError]: {e}")
 
     def create_alt_path(self) -> None:
         direction = randint(0, 1)

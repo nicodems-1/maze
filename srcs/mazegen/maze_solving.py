@@ -1,8 +1,7 @@
 from .maze_generation import MazeGenerator, Cell
-from .parsing import MazeConfig
 
-
-def solve_maze(config: MazeConfig, maze_obj: MazeGenerator) -> None:
+def maze_solver(maze_obj: MazeGenerator) -> None:
+    config = maze_obj.config
     maze = maze_obj.maze
     n = maze_obj.height
     m = maze_obj.width
@@ -11,7 +10,7 @@ def solve_maze(config: MazeConfig, maze_obj: MazeGenerator) -> None:
     x_exit = config["EXIT"][1]
     y_exit = config["EXIT"][0]
     entry = (x_entry, y_entry)
-    directions = {(-1, 0): "N", (0, 1): "E", (1, 0): "S", (0, -1): "W"}
+    directions = {(-1, 0): "N",(0, 1): "E", (1, 0): "S", (0, -1): "W"}
 
     queue = [entry]
     history = {entry: ((x_entry, y_entry), "ENTRY POINT")}

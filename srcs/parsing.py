@@ -1,5 +1,6 @@
 import sys
-from typing import TypedDict, cast
+from typing import cast
+from srcs.mazegen import MazeConfig
 
 
 class ParsingError(Exception):
@@ -9,14 +10,6 @@ class ParsingError(Exception):
         super().__init__(message)
 
 
-class MazeConfig(TypedDict):
-    WIDTH: int
-    HEIGHT: int
-    ENTRY: tuple[int, int]
-    EXIT: tuple[int, int]
-    OUTPUT_FILE: str
-    PERFECT: bool
-    SEED: int
 
 
 def _convert_value(key: str, value: str) -> int | tuple[int, int] | str | bool:
