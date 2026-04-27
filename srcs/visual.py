@@ -1,16 +1,8 @@
-<<<<<<< Updated upstream
-from mlx import Mlx # type: ignore
-import random
-from srcs.maze_generation import MazeGenerator # type: ignore
-from typing import Callable, Dict, Tuple, Union, cast
-
-ConfigDict = Dict[str, Union[int, Tuple[int, int], str, bool]]
-=======
 import random
 from mlx import Mlx  # type: ignore
-from .maze_generation import MazeGenerator
-from .parsing import MazeConfig
->>>>>>> Stashed changes
+from srcs.maze_generation import MazeGenerator
+from srcs.parsing import MazeConfig
+from typing import Callable, cast
 
 
 class Visual:
@@ -28,7 +20,7 @@ class Visual:
     horizontal_cells: int
     vertical_cells: int
 
-    def __init__(self, maze_obj: MazeGenerator, config: ConfigDict) -> None:
+    def __init__(self, maze_obj: MazeGenerator, config: MazeConfig) -> None:
         self.maze_obj = maze_obj
         self.config = config
         self.draw: bool = False
