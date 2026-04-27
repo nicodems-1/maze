@@ -17,12 +17,14 @@ def _convert_value(key: str, value: str) -> int | tuple[int, int] | str | bool:
                 if int(value) < 3:
                     raise ParsingError("Width cannot be smaller than 3")
                 if int(value) < 9:
-                    print("Width should be greater than 8 to display '42'", file=sys.stderr)
+                    print("Width should be greater than 8 to display '42'",
+                          file=sys.stderr)
             if key == "HEIGHT":
                 if int(value) < 3:
                     raise ParsingError("Height cannot be smaller than 3")
                 if int(value) < 7:
-                    print("Height should be greater than 6 to display '42'", file=sys.stderr)
+                    print("Height should be greater than 6 to display '42'",
+                          file=sys.stderr)
             if key == "WIDTH" and int(value) > 420:
                 raise ParsingError("Width cannot be greater than 420")
             if key == "HEIGHT" and int(value) > 420:
