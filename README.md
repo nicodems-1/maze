@@ -1,16 +1,22 @@
-*This project has been created as part of the 42 curriculum by <login1>[, <login2>[, <login3>[...]]].*
+*This project has been created as part of the 42 curriculum by chafonta, niverdie.*
 
 # A-Maze-ing
 
 ## Description
 [Clearly present the project, including its goal and a brief overview.]
+The goal of this project is to generate, display and solve a maze based on the config file. 
+
+In the config file the user can tweak parameters such as the height and the width of the maze.
 
 ## Instructions
 ### Compilation and Installation
 [Provide relevant information about compilation and installation.]
+For packages installation: make install. 
+Alternatively you can "make run" without prior command and the installation will happen.
 
 ### Execution
 [Provide relevant information about execution.]
+
 
 ## Resources
 [List classic references related to the topic: documentation, articles, tutorials, etc.]
