@@ -106,7 +106,7 @@ class Parser:
                         )
                     raw[key] = _convert_value(key, value)
 
-            missing = self.parameters - raw.keys()
+            missing = (self.parameters - {"SEED"}) - raw.keys()
             if missing:
                 raise ParsingError(f"Missing required parameters: "
                                    f"{str(missing).strip('{}')}")
