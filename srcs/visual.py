@@ -115,41 +115,42 @@ class Visual:
         self.fill_path(x, y, (255, 0, 0))
         self.fill_path(j, q, (0, 255, 0))
         self.mlx_instance.mlx_clear_window(self.mlx_ptr, self.win_ptr)
+        logo_placement = 50
         self.mlx_instance.mlx_string_put(
-            self.mlx_ptr, self.win_ptr, 3000, 250, int("0000FF", 16), "ENTRY"
+            self.mlx_ptr, self.win_ptr, logo_placement, 50, int("0000FF", 16), "ENTRY"
         )
         self.mlx_instance.mlx_string_put(
-            self.mlx_ptr, self.win_ptr, 3000, 270, int("00FF00", 16), "EXIT"
+            self.mlx_ptr, self.win_ptr, logo_placement, 70, int("00FF00", 16), "EXIT"
         )
         self.mlx_instance.mlx_string_put(
             self.mlx_ptr,
             self.win_ptr,
-            3000,
-            290,
+            logo_placement,
+            90,
             int("FFE100", 16),
             "C : Change color",
         )
         self.mlx_instance.mlx_string_put(
             self.mlx_ptr,
             self.win_ptr,
-            3000,
-            310,
+            logo_placement,
+            110,
             int("FFE100", 16),
             "Q : Close window",
         )
         self.mlx_instance.mlx_string_put(
             self.mlx_ptr,
             self.win_ptr,
-            3000,
-            330,
+            logo_placement,
+            130,
             int("FFE100", 16),
             "S : Show/hide path",
         )
         self.mlx_instance.mlx_string_put(
             self.mlx_ptr,
             self.win_ptr,
-            3000,
-            350,
+            logo_placement,
+            150,
             int("FFE100", 16),
             "R : Regenerate Maze",
         )
@@ -176,11 +177,13 @@ class Visual:
             u += 1
 
     def fill_path(self, offset_x: int, offset_y: int, color: tuple):
-        for u in range(self.cell - int((self.cell / 2))):
-            for i in range(self.cell - int((self.cell / 2))):
+        path_size = self.cell // 2
+        padding = (self.cell - path_size) // 2
+        for u in range(path_size):
+            for i in range(path_size):
                 self.put_pixel(
-                    self.center_x + offset_x + i + int((self.cell / 2) / 2),
-                    self.center_y + offset_y + u + int((self.cell / 2) / 2),
+                    self.center_x + offset_x + i + padding,
+                    self.center_y + offset_y + u + padding,
                     *color,
                 )
             u += 1
