@@ -32,7 +32,8 @@ class MazeGenerator:
         self.output = self.format_output()
 
     def generate_maze(self) -> None:
-        self.put_42()
+        if self.width > 8 and self.height > 6:
+            self.put_42()
         self.dfs_algorithm(self.maze[0][0])
 
     def dfs_algorithm(self, current: Cell) -> None:
