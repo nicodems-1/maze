@@ -178,11 +178,13 @@ class Visual:
             u += 1
 
     def fill_path(self, offset_x: int, offset_y: int, color: tuple):
-        for u in range(self.cell - int((self.cell / 2))):
-            for i in range(self.cell - int((self.cell / 2))):
+        path_size = self.cell // 2
+        padding = (self.cell - path_size) // 2
+        for u in range(path_size):
+            for i in range(path_size):
                 self.put_pixel(
-                    self.center_x + offset_x + i + int((self.cell / 2) / 2),
-                    self.center_y + offset_y + u + int((self.cell / 2) / 2),
+                    self.center_x + offset_x + i + padding,
+                    self.center_y + offset_y + u + padding,
                     *color,
                 )
             u += 1
