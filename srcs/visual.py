@@ -117,10 +117,12 @@ class Visual:
         self.mlx_instance.mlx_clear_window(self.mlx_ptr, self.win_ptr)
         logo_placement = 50
         self.mlx_instance.mlx_string_put(
-            self.mlx_ptr, self.win_ptr, logo_placement, 50, int("0000FF", 16), "ENTRY"
+            self.mlx_ptr, self.win_ptr, logo_placement,
+            50, int("0000FF", 16), "ENTRY"
         )
         self.mlx_instance.mlx_string_put(
-            self.mlx_ptr, self.win_ptr, logo_placement, 70, int("00FF00", 16), "EXIT"
+            self.mlx_ptr, self.win_ptr, logo_placement,
+            70, int("00FF00", 16), "EXIT"
         )
         self.mlx_instance.mlx_string_put(
             self.mlx_ptr,
@@ -176,7 +178,11 @@ class Visual:
                 )
             u += 1
 
-    def fill_path(self, offset_x: int, offset_y: int, color: tuple):
+    def fill_path(self,
+                  offset_x: int,
+                  offset_y: int,
+                  color: tuple[int, int, int]
+                  ) -> None:
         path_size = self.cell // 2
         padding = (self.cell - path_size) // 2
         for u in range(path_size):
