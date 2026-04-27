@@ -1,8 +1,8 @@
 import random
 from mlx import Mlx  # type: ignore
-from srcs.maze_generation import MazeGenerator
-from srcs.parsing import MazeConfig
-from typing import Callable, cast
+from typing import Any
+from srcs.mazegen import MazeGenerator
+from srcs.mazegen import MazeConfig
 
 
 class Visual:
@@ -47,8 +47,8 @@ class Visual:
         self.vertical_color = (255, 255, 255)
         self.horizontal_color = (255, 255, 255)
         self.log_color = (255, 0, 0)
-        height_val = cast(int, self.config["HEIGHT"])
-        width_val = cast(int, self.config["WIDTH"])
+        height_val = self.config["HEIGHT"]
+        width_val = self.config["WIDTH"]
         self.padding = max(height_val, width_val)
 
         self.key_map = {
@@ -58,31 +58,31 @@ class Visual:
             115: self.path_draw,
         }
 
-    def handle_input(self, keycode: int, params: Callable):
+    def handle_input(self, keycode: int, _params: Any) -> None:
         func = self.key_map.get(keycode)
         if func:
             func()
 
-    def close_window(self):
+    def close_window(self) -> None:
         self.mlx_instance.mlx_destroy_window(self.mlx_ptr, self.win_ptr)
         self.mlx_instance.mlx_loop_exit(self.mlx_ptr)
 
-    def change_color(self):
+    def change_color(self) -> None:
         self.vertical_color, self.horizontal_color = self.random_colors()
         _, self.log_color = self.random_colors()
         self.display_maze()
-        if self.draw is True:
+        if self.draw:
             self.draw = False
             self.path_draw()
 
-    def regenerate(self):
+    def regenerate(self) -> None:
         from a_maze_ing import generate_and_solve_maze
 
         self.draw = False
         self.maze_obj = generate_and_solve_maze(self.config)
         self.display_maze()
 
-    def create_window(self):
+    def create_window(self) -> None:
         _, self.width, self.height = self.mlx_instance.mlx_get_screen_size(
             self.mlx_ptr
         )
@@ -90,7 +90,7 @@ class Visual:
             self.mlx_ptr, self.width, self.height, "a-maze-ing"
         )
 
-    def generate_cells(self, hexa: int, x_offset: int, y_offset: int):
+    def generate_cells(self, hexa: int, x_offset: int, y_offset: int) -> None:
         # creating line
         if hexa & 1 == 1:
             for i in range(self.cell):
@@ -108,7 +108,7 @@ class Visual:
                     *self.vertical_color,
                 )
 
-    def display_maze(self):
+    def display_maze(self) -> None:
         self.create_maze(str(self.maze_obj.output))
         x, y = self.real_pos(self.config["ENTRY"])
         j, q = self.real_pos(self.config["EXIT"])
@@ -117,10 +117,12 @@ class Visual:
         self.mlx_instance.mlx_clear_window(self.mlx_ptr, self.win_ptr)
         logo_placement = 50
         self.mlx_instance.mlx_string_put(
-            self.mlx_ptr, self.win_ptr, logo_placement, 50, int("0000FF", 16), "ENTRY"
+            self.mlx_ptr, self.win_ptr, logo_placement,
+            50, int("0000FF", 16), "ENTRY"
         )
         self.mlx_instance.mlx_string_put(
-            self.mlx_ptr, self.win_ptr, logo_placement, 70, int("00FF00", 16), "EXIT"
+            self.mlx_ptr, self.win_ptr, logo_placement,
+            70, int("00FF00", 16), "EXIT"
         )
         self.mlx_instance.mlx_string_put(
             self.mlx_ptr,
@@ -158,7 +160,7 @@ class Visual:
             self.mlx_ptr, self.win_ptr, self.img_ptr, 0, 0
         )
 
-    def put_pixel(self, x: int, y: int, r: int, g: int, b: int):
+    def put_pixel(self, x: int, y: int, r: int, g: int, b: int) -> None:
         index = (y * self.size_line) + (x * (self.bpp // 8))
 
         self.img_data[index] = b
@@ -166,7 +168,7 @@ class Visual:
         self.img_data[index + 2] = r
         self.img_data[index + 3] = 255
 
-    def fill_square(self, offset_x: int, offset_y: int):
+    def fill_square(self, offset_x: int, offset_y: int) -> None:
         for u in range(self.cell):
             for i in range(self.cell):
                 self.put_pixel(
@@ -176,7 +178,11 @@ class Visual:
                 )
             u += 1
 
-    def fill_path(self, offset_x: int, offset_y: int, color: tuple):
+    def fill_path(self,
+                  offset_x: int,
+                  offset_y: int,
+                  color: tuple[int, int, int]
+                  ) -> None:
         path_size = self.cell // 2
         padding = (self.cell - path_size) // 2
         for u in range(path_size):
@@ -188,7 +194,7 @@ class Visual:
                 )
             u += 1
 
-    def create_maze(self, parsed: str):
+    def create_maze(self, parsed: str) -> None:
         self.img_data[:] = b"\x00" * len(self.img_data)
         lines = parsed.splitlines()
 
@@ -218,8 +224,8 @@ class Visual:
                 x_offset += self.cell
         self.close_maze()
 
-    def path_draw(self):
-        if self.draw is False:
+    def path_draw(self) -> None:
+        if not self.draw:
             the_path = self.maze_obj.path
             for pos in the_path:
                 y, x = self.real_pos(pos)
@@ -228,7 +234,7 @@ class Visual:
                 self.mlx_ptr, self.win_ptr, self.img_ptr, 0, 0
             )
             self.draw = True
-        elif self.draw is True:
+        elif self.draw:
             the_path = self.maze_obj.path
             for pos in the_path:
                 y, x = self.real_pos(pos)
@@ -238,13 +244,13 @@ class Visual:
             )
             self.draw = False
 
-    def real_pos(self, pos: tuple) -> tuple:
+    def real_pos(self, pos: tuple[int, int]) -> tuple[int, int]:
         x, y = pos
         real_x = self.cell * x
         real_y = self.cell * y
-        return (real_x, real_y)
+        return real_x, real_y
 
-    def close_maze(self):
+    def close_maze(self) -> None:
         for i in range(self.cell * self.horizontal_cells):
             self.put_pixel(
                 self.center_x + i,
@@ -259,7 +265,7 @@ class Visual:
             )
 
     @staticmethod
-    def random_colors():
+    def random_colors() -> tuple[tuple[int, int, int], tuple[int, int, int]]:
         list_colors = [
             ((0, 255, 255), (255, 0, 255)),
             ((255, 220, 0), (255, 65, 64)),
@@ -275,7 +281,7 @@ class Visual:
         ]
         return random.choice(list_colors)
 
-    def run_win(self):
+    def run_win(self) -> None:
         self.mlx_instance.mlx_key_hook(self.win_ptr, self.handle_input, vars)
         self.display_maze()
         self.mlx_instance.mlx_loop(self.mlx_ptr)
